@@ -1,0 +1,18 @@
+[submodule "dependencies/glm"]
+	path = dependencies/glm
+	url = https://github.com/g-truc/glm.git
+	branch = master
+[submodule "dependencies/imgui"]
+	path = dependencies/imgui
+	url = https://github.com/ocornut/imgui.git
+	branch = docking
+[submodule "dependencies/imnodes"]
+	path = dependencies/imnodes
+	url = https://github.com/Nelarius/imnodes.git
+	branch = master
+[submodule "dependencies/rapidxml"]
+	path = dependencies/rapidxml
+	url = https://github.com/discord/rapidxml.git
+[submodule "dependencies/glfw"]
+	path = dependencies/glfw
+	url = https://github.com/glfw/glfw.git

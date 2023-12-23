@@ -1,0 +1,15 @@
+#pragma once
+#include "Core/Log.h"
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+#include <set>
+#include <map>
+#include <string>
+#include <sstream>
+#include <functional>
+#include <memory>
+#include <algorithm>
+#include <array>
+#include <utility>
+#include <optional>

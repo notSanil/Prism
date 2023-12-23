@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{14b81237-5c53-49ca-b3da-b836e5cfa093}</ProjectGuid>
+    <RootNamespace>AdvanceRendering</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Prism</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level2</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;STB_IMAGE_IMPLMENTATION</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)dependencies\imnodes;$(ProjectDir)dependencies\glad\include;$(ProjectDir)dependencies\glfw\include;$(ProjectDir)source;$(ProjectDir)dependencies\glm\glm;$(ProjectDir)dependencies\rapidxml;%(AdditionalIncludeDirectories);$(ProjectDir)dependencies\imgui;$(ProjectDir)dependencies\stb_image</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;STB_IMAGE_IMPLMENTATION</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\sanil\source\repos\AdvanceRendering\AdvanceRendering\dependencies\glad\include;C:\Users\sanil\source\repos\AdvanceRendering\AdvanceRendering\dependencies\glfw\include;%(AdditionalIncludeDirectories);C:\Users\sanil\source\repos\AdvanceRendering\AdvanceRendering\dependencies\imgui;C:\Users\sanil\source\repos\AdvanceRendering\AdvanceRendering\dependencies\stb_image</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="source\ShaderEditor\Nodes\FileNode.cpp" />
+    <ClCompile Include="source\ShaderEditor\Nodes\Node.cpp" />
+    <ClCompile Include="source\ShaderEditor\Nodes\ShaderNode.cpp" />
+    <ClCompile Include="source\ShaderEditor\NodeManager.cpp" />
+    <ClCompile Include="source\Core\SceneRenderer.cpp" />
+    <ClCompile Include="source\ShaderEditor\Nodes\Vec3Node.cpp" />
+    <ClCompile Include="source\ShaderEditor\ShaderEditor.cpp" />
+    <ClCompile Include="source\Core\Renderspace.cpp" />
+    <ClCompile Include="source\Rendering\AntiAliasedFramebuffer.cpp" />
+    <ClCompile Include="source\Rendering\DataTypeGuiRenderer.cpp" />
+    <ClCompile Include="source\Rendering\GlslDataTypes.cpp" />
+    <ClCompile Include="source\Rendering\Model.cpp" />
+    <ClCompile Include="source\Rendering\Renderer.cpp" />
+    <ClCompile Include="source\Rendering\Framebuffer.cpp" />
+    <ClCompile Include="source\Core\ColladaReader.cpp" />
+    <ClCompile Include="source\Core\Camera.cpp" />
+    <ClCompile Include="source\Core\ImGuiImpl.cpp" />
+    <ClCompile Include="source\Core\imgui_impl_glfw.cpp" />
+    <ClCompile Include="source\Core\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="source\Core\Input.cpp" />
+    <ClCompile Include="source\Core\Mesh.cpp" />
+    <ClCompile Include="source\Engine.cpp" />
+    <ClCompile Include="source\Rendering\Buffer.cpp" />
+    <ClCompile Include="source\Rendering\Shader.cpp" />
+    <ClCompile Include="source\Core\Log.cpp" />
+    <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="source\Core\Window.cpp" />
+    <ClCompile Include="source\Rendering\VertexAttributeObject.cpp" />
+    <ClCompile Include="source\Rendering\Texture.cpp" />
+    <ClCompile Include="source\ShaderEditor\Nodes\TextureNode.cpp" />
+    <ClCompile Include="source\ShaderEditor\Nodes\Vec4Node.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\ShaderEditor\Nodes\Attributes.h" />
+    <ClInclude Include="source\ShaderEditor\Nodes\FileNode.h" />
+    <ClInclude Include="source\ShaderEditor\Nodes\ShaderNode.h" />
+    <ClInclude Include="source\ShaderEditor\Nodes\Node.h" />
+    <ClInclude Include="source\ShaderEditor\NodeManager.h" />
+    <ClInclude Include="source\Core\SceneRenderer.h" />
+    <ClInclude Include="source\ShaderEditor\Nodes\Vec3Node.h" />
+    <ClInclude Include="source\ShaderEditor\ShaderEditor.h" />
+    <ClInclude Include="source\Core\Renderspace.h" />
+    <ClInclude Include="source\Rendering\DataTypeGuiRenderer.h" />
+    <ClInclude Include="source\Rendering\AntiAliasedFramebuffer.h" />
+    <ClInclude Include="source\Rendering\GlslDataTypes-def.h" />
+    <ClInclude Include="source\Rendering\GlslDataTypes.h" />
+    <ClInclude Include="source\Rendering\Model.h" />
+    <ClInclude Include="source\Rendering\Light.h" />
+    <ClInclude Include="source\Rendering\Material.h" />
+    <ClInclude Include="source\Rendering\Renderer.h" />
+    <ClInclude Include="source\Rendering\Framebuffer.h" />
+    <ClInclude Include="source\Core\ColladaReader.h" />
+    <ClInclude Include="source\Core\Camera.h" />
+    <ClInclude Include="source\Core\ImGuiImpl.h" />
+    <ClInclude Include="source\Core\Input.h" />
+    <ClInclude Include="source\Core\Mesh.h" />
+    <ClInclude Include="source\Core\Timer.h" />
+    <ClInclude Include="source\Engine.h" />
+    <ClInclude Include="source\Events\KeyboardEvents.h" />
+    <ClInclude Include="source\Rendering\Buffer.h" />
+    <ClInclude Include="dependencies\glfw-3.3.8\include\GLFW\glfw3native.h" />
+    <ClInclude Include="source\Rendering\Shader.h" />
+    <ClInclude Include="source\Events\Event.h" />
+    <ClInclude Include="source\Core\Log.h" />
+    <ClInclude Include="source\Events\MouseEvents.h" />
+    <ClInclude Include="source\Events\WindowEvents.h" />
+    <ClInclude Include="source\pch.h" />
+    <ClInclude Include="source\Core\Window.h" />
+    <ClInclude Include="source\Rendering\Vertex.h" />
+    <ClInclude Include="source\Rendering\VertexAttributeObject.h" />
+    <ClInclude Include="source\Rendering\Texture.h" />
+    <ClInclude Include="source\ShaderEditor\Nodes\TextureNode.h" />
+    <ClInclude Include="source\ShaderEditor\Nodes\Vec4Node.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+    <None Include="Resources\Shaders\basicShader.glsl" />
+    <None Include="Resources\Shaders\flatColorShader.glsl" />
+    <None Include="Resources\Shaders\goochShader.glsl" />
+    <None Include="Resources\Shaders\lineDrawShader.glsl" />
+    <None Include="Resources\Shaders\phongShader.glsl" />
+    <None Include="Resources\Shaders\vertexShader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Resources\Models\CubeData.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="dependencies\glad\glad.vcxproj">
+      <Project>{0ef5622b-6d8a-4d87-ab5f-95982ec72b11}</Project>
+    </ProjectReference>
+    <ProjectReference Include="dependencies\glfw\glfw.vcxproj">
+      <Project>{5f489e20-739c-4ec6-95e6-4d47d0660b32}</Project>
+    </ProjectReference>
+    <ProjectReference Include="dependencies\imgui\imgui.vcxproj">
+      <Project>{68c21e1e-458e-4760-bce4-72cf7e20ca48}</Project>
+    </ProjectReference>
+    <ProjectReference Include="dependencies\imnodes\imnodes.vcxproj">
+      <Project>{9f8917f3-b9e1-43fa-9801-2d26a4748b53}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
