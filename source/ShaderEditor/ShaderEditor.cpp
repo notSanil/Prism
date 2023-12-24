@@ -31,7 +31,7 @@ void ShaderEditor::GuiRender()
 {
 	//ImGui::ShowDemoWindow();
 
-	ImGui::Begin("simple node editor");
+	ImGui::Begin("Editor");
 	
 	ImNodes::BeginNodeEditor();
 	bool editorHovered = ImNodes::IsEditorHovered();
@@ -73,5 +73,8 @@ void ShaderEditor::GuiRender()
 	}
 	ImGui::End();
 
-	//ImGui::ShowDemoWindow();
+	m_Explorer.GuiRender();
+
+
+	ImGui::ShowDemoWindow();
 }

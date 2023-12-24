@@ -4,6 +4,7 @@
 #include <imgui.h>
 #include <glm.hpp>
 #include <Core/Input.h>
+#include "ShaderEditor/Explorer.h"
 
 class ShaderEditor
 {
@@ -27,5 +28,6 @@ private:
 
 private:
 	NodeManager m_NodeManager;
+	Explorer m_Explorer;
 };
 

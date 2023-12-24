@@ -45,6 +45,15 @@ void FileNode::GuiRender()
 	ImGui::PopItemWidth();
 	ImNodes::EndOutputAttribute();
 
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("FILE_PATH"))
+		{
+			const char* data = static_cast<const char*>(payload->Data);
+			m_SourcePath = std::string(data, payload->DataSize);
+		}
+	}
+
 	ImNodes::EndNode();
 }
 

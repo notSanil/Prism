@@ -111,6 +111,9 @@
     <ClCompile Include="source\ShaderEditor\Nodes\Vec3Node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\ShaderEditor\Explorer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\glfw-3.3.8\include\GLFW\glfw3native.h">
@@ -231,6 +234,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\ShaderEditor\Nodes\Vec3Node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\ShaderEditor\Explorer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

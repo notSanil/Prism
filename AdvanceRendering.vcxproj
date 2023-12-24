@@ -86,6 +86,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="source\ShaderEditor\Explorer.cpp" />
     <ClCompile Include="source\ShaderEditor\Nodes\FileNode.cpp" />
     <ClCompile Include="source\ShaderEditor\Nodes\Node.cpp" />
     <ClCompile Include="source\ShaderEditor\Nodes\ShaderNode.cpp" />
@@ -123,6 +124,7 @@
     <ClCompile Include="source\ShaderEditor\Nodes\Vec4Node.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\ShaderEditor\Explorer.h" />
     <ClInclude Include="source\ShaderEditor\Nodes\Attributes.h" />
     <ClInclude Include="source\ShaderEditor\Nodes\FileNode.h" />
     <ClInclude Include="source\ShaderEditor\Nodes\ShaderNode.h" />
