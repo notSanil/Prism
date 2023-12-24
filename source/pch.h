@@ -13,3 +13,4 @@
 #include <array>
 #include <utility>
 #include <optional>
+#include <bit>

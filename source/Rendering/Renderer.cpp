@@ -4,7 +4,7 @@
 #include "Events/WindowEvents.h"
 
 #ifdef _DEBUG
-static void glErrorMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+static void __stdcall glErrorMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
 	const GLchar* message, const void* userParam)
 {
 	LOG_ERROR(message);
