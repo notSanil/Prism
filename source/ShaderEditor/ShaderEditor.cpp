@@ -40,15 +40,15 @@ void ShaderEditor::GuiRender()
 	ImNodes::MiniMap();
 	ImNodes::EndNodeEditor();
 
-	if (editorHovered && windowFocused)
+	if (editorHovered)
 	{
 		if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
 		{
-			ImGui::OpenPopup("my_select_popup");
+			ImGui::OpenPopup("Node Add Popup");
 		}
 	}
 
-	if (ImGui::BeginPopup("my_select_popup"))
+	if (ImGui::BeginPopup("Node Add Popup"))
 	{
 		RenderSelectableNode<FileNode>();
 		RenderSelectableNode<ShaderNode>();
@@ -71,10 +71,25 @@ void ShaderEditor::GuiRender()
 	{
 		m_NodeManager.DeleteLink(id);
 	}
+
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (ImGui::AcceptDragDropPayload("FILE_PATH"))
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("FILE_PATH"))
+			{
+				const char* data = static_cast<const char*>(payload->Data);
+				std::string path = std::string(data, payload->DataSize);
+				FileNode& node = m_NodeManager.AddNode<FileNode>({ Input::GetMouseX(), Input::GetMouseY() });
+				node.SetSourcePath(path);
+			}
+		}
+		ImGui::EndDragDropTarget();
+	}
 	ImGui::End();
 
 	m_Explorer.GuiRender();
 
 
-	ImGui::ShowDemoWindow();
+	//ImGui::ShowDemoWindow();
 }

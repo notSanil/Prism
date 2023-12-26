@@ -52,6 +52,7 @@ void FileNode::GuiRender()
 			const char* data = static_cast<const char*>(payload->Data);
 			m_SourcePath = std::string(data, payload->DataSize);
 		}
+		ImGui::EndDragDropTarget();
 	}
 
 	ImNodes::EndNode();

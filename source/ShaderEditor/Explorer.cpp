@@ -12,17 +12,23 @@ Explorer::Explorer()
 void Explorer::GuiRender()
 {
 	ImGui::Begin("Explorer");
-	std::filesystem::path newDirectory;
 
-	if (m_CurrentDirectory != "Resources")
+	std::filesystem::path currentPath;
+	for (auto it = m_CurrentDirectory.begin(); it != m_CurrentDirectory.end(); ++it)
 	{
-		if (ImGui::Button("<-"))
+		currentPath /= *it;
+		if (ImGui::Button(it->string().c_str()))
 		{
-			newDirectory = m_CurrentDirectory.parent_path();
+			m_CurrentDirectory = currentPath;
 		}
+		ImGui::SameLine();
+		ImGui::Text(">");
+		ImGui::SameLine();
 	}
 
+	ImGui::NewLine();
 
+	std::filesystem::path newDirectory;
 	float width = ImGui::GetContentRegionAvail().x;
 	int columnCount = width / (c_ImageSize + 100.0);
 
