@@ -11,7 +11,7 @@ FileNode::FileNode(int id)
 {
 	m_SourcePath.reserve(64);
 
-	m_OutputAttribute = { DataType::File, &m_SourcePath, "" };
+	m_OutputAttributes.push_back({ DataType::File, &m_SourcePath, "" });
 
 	if (!s_Icon)
 		s_Icon = std::make_unique<Texture>("Resources/Textures/File.png");

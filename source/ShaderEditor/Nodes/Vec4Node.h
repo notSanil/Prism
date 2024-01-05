@@ -10,13 +10,9 @@ public:
 
 	virtual void Render() override;
 	virtual void GuiRender() override;
-	virtual const OutputAttribute* GetOutputAttribute(int idx) const override { return &m_OutputAttribute; };
-	virtual const InputAttribute* GetInputAttribute(int idx) const override { return nullptr; };
-	virtual InputAttribute* GetInputAttribute(int idx) override { return nullptr; };
 
 	NODE(Float4)
 private:
-	OutputAttribute m_OutputAttribute;
 	glm::vec4 m_Value;
 };
 

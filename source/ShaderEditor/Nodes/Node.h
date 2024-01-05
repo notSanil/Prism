@@ -11,7 +11,8 @@ enum class NodeType
 };
 
 #define NODE(x) static constexpr const char* GetName() {return #x;} \
-virtual constexpr NodeType GetType() const {return NodeType::x;}
+virtual constexpr NodeType GetType() const {return NodeType::x;} \
+friend class NodeManager;
 
 
 class Node
@@ -24,14 +25,16 @@ public:
 
 	virtual void Render() = 0;
 	virtual void GuiRender() = 0;
-	virtual const OutputAttribute* GetOutputAttribute(int idx) const = 0;
-	virtual const InputAttribute* GetInputAttribute(int idx) const = 0;
-	virtual InputAttribute* GetInputAttribute(int idx) = 0;
+	const OutputAttribute* GetOutputAttribute(size_t idx) const { return idx < m_OutputAttributes.size() ? &m_OutputAttributes.at(idx) : nullptr; };
+	const InputAttribute* GetInputAttribute(size_t idx) const {return idx < m_InputAttributes.size() ? &m_InputAttributes.at(idx) : nullptr;};
+	InputAttribute* GetInputAttribute(int idx) { return idx < m_InputAttributes.size() ? &m_InputAttributes.at(idx) : nullptr; };
 
 	NODE(None)
 
 protected:
 	int m_Id = 0;
 	const int c_InputStart, c_OutputStart, c_StaticStart;
+	std::vector<InputAttribute> m_InputAttributes;
+	std::vector<OutputAttribute> m_OutputAttributes;
 };
 

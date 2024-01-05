@@ -6,7 +6,7 @@
 Vec3Node::Vec3Node(int id)
 	:Node(id)
 {
-	m_OutputAttribute = { DataType::Float3, &m_Value, "" };
+	m_OutputAttributes.push_back({ DataType::Float3, &m_Value, "" });
 	m_Value = glm::vec3(0.0f);
 }
 
@@ -31,19 +31,4 @@ void Vec3Node::GuiRender()
 	ImNodes::EndOutputAttribute();
 
 	ImNodes::EndNode();
-}
-
-const OutputAttribute* Vec3Node::GetOutputAttribute(int idx) const
-{
-	return &m_OutputAttribute;
-}
-
-const InputAttribute* Vec3Node::GetInputAttribute(int idx) const
-{
-	return nullptr;
-}
-
-InputAttribute* Vec3Node::GetInputAttribute(int idx)
-{
-	return nullptr;
 }

@@ -15,12 +15,8 @@ public:
 	void GuiRender() override;
 	inline const std::string& GetSourcePath() const { return m_SourcePath; };
 	inline void SetSourcePath(std::string path) { m_SourcePath = path; }
-	virtual const OutputAttribute* GetOutputAttribute(int idx) const override { return &m_OutputAttribute; };
-	virtual const InputAttribute* GetInputAttribute(int idx) const override { return nullptr; };
-	virtual InputAttribute* GetInputAttribute(int idx) override { return nullptr; };
 private:
 	std::string m_SourcePath;
-	OutputAttribute m_OutputAttribute;
 	
 	static std::unique_ptr<Texture> s_Icon;
 };

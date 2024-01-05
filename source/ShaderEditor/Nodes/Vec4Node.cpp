@@ -6,7 +6,7 @@
 Vec4Node::Vec4Node(int id)
 	:Node(id)
 {
-	m_OutputAttribute = { DataType::Float4, &m_Value, "" };
+	m_OutputAttributes.push_back({ DataType::Float4, &m_Value, "" });
 	m_Value = glm::vec4(0.0);
 }
 

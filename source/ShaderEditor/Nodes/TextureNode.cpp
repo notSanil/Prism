@@ -5,8 +5,8 @@
 TextureNode::TextureNode(int id)
 	:Node(id)
 {
-	m_OutputAttribute = { DataType::Sampler2D, &m_Texture, "" };
-	m_InputAttribute = { DataType::File, nullptr, "Texture"};
+	m_OutputAttributes.push_back({ DataType::Sampler2D, &m_Texture, "Color" });
+	m_InputAttributes.push_back({ DataType::File, nullptr, "Texture" });
 }
 
 TextureNode::~TextureNode()
@@ -21,7 +21,7 @@ void TextureNode::GuiRender()
 	ImNodes::EndNodeTitleBar();
 
 	ImNodes::BeginInputAttribute(c_InputStart + 0);
-	ImGui::Text("%s (%s)", m_InputAttribute.Name.c_str(), DataTypeToString[static_cast<int>(m_InputAttribute.Type)].c_str());
+	ImGui::Text("%s (%s)", m_InputAttributes[0].Name.c_str(), DataTypeToString[static_cast<int>(m_InputAttributes[0].Type)].c_str());
 	ImNodes::EndInputAttribute();
 
 	ImNodes::BeginOutputAttribute(c_OutputStart + 0);
@@ -34,9 +34,9 @@ void TextureNode::GuiRender()
 
 void TextureNode::Render()
 {
-	if (m_InputAttribute.Value && !m_Texture)
+	if (m_InputAttributes[0].Value && !m_Texture)
 	{
-		const std::string& path = *static_cast<const std::string*>(m_InputAttribute.Value);
+		const std::string& path = *static_cast<const std::string*>(m_InputAttributes[0].Value);
 
 		m_Texture = std::make_unique<Texture>(path);
 	}
