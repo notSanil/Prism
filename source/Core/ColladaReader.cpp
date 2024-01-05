@@ -3,9 +3,14 @@
 #include <rapidxml_utils.hpp>
 #include "Core/Mesh.h"
 #include "Rendering/Model.h"
+#include <cstddef>
+#include <span>
 
-#define VERTICES_PER_TRIANGLE 3
-#define ATTRIBUTES_PER_VERTEX 3
+#define VERTICES_PER_TRIANGLE 3ul
+#define ATTRIBUTES_PER_VERTEX 3ul
+
+#define GEOMETRY_NODE "instance_geometry"
+
 
 void FillTransform(rapidxml::xml_node<>* transformDataNode, glm::mat4& transform)
 {
@@ -20,13 +25,26 @@ Model ColladaReader::ParseFile(const std::string& path)
 	rapidxml::xml_document<> doc;
 	doc.parse<0>(xmlFile.data());
 
-	auto geometriesRoot = doc.first_node()->first_node("library_geometries");
+	/*
+	Rough structure of file(See Collada Spec 1.4.1, page 68 for more details)
+
+	GeometryLibarary
+	|__ Geometry
+	|	|__ Mesh
+	|		|__ Source
+	|		|__ Source
+	|		|__ Source
+	|		|__ Vertices
+	|		|__ Polylist / Triangles / etc
+	|__ Geometry
+	*/
+	auto geometryLibraryNode = doc.first_node()->first_node("library_geometries");
 	std::unordered_map<std::string, GeometryData> geometryRepository;
-	for (auto meshGeometryNode = geometriesRoot->first_node(); meshGeometryNode; meshGeometryNode = meshGeometryNode->next_sibling())
+
+	for (auto geometry = geometryLibraryNode->first_node(); geometry; geometry = geometry->next_sibling())
 	{
-		GeometryData data = ParseGeometryNode(meshGeometryNode->first_node(), 
-			meshGeometryNode->first_attribute()->value());
-		std::string geometryID = meshGeometryNode->first_attribute()->value();
+		GeometryData data = ParseMeshNode(geometry->first_node());
+		std::string geometryID = geometry->first_attribute()->value();
 
 		geometryRepository[geometryID] = data;
 	}
@@ -53,103 +71,228 @@ Model ColladaReader::ParseFile(const std::string& path)
 	return model;
 }
 
-ColladaReader::GeometryData ColladaReader::ParseGeometryNode(rapidxml::xml_node<>* geometryNode, const std::string& geometryID)
+ColladaReader::GeometryData ColladaReader::ParseMeshNode(rapidxml::xml_node<>* meshNode)
 {
 	const std::string triangleNodeName = "triangles";
+	const std::string sourceNodeName = "source";
+	const std::string verticesNodeName = "vertices";
 
 	std::vector<float> positions;
-	std::vector<float> normals;
-	std::vector<float> uvs;
+
+	std::unordered_map<std::string, std::pair<DataType, std::vector<std::byte>>> sourceNodes;
 
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
-
-	for (auto dataNode = geometryNode->first_node(); dataNode; dataNode = dataNode->next_sibling())
+	
+	auto currentNode = meshNode->first_node();
+	while (currentNode && currentNode->name() == sourceNodeName)
 	{
-		if (dataNode->first_attribute()->value() == geometryID + "-positions")
-		{
-			FillBufferFromNode(dataNode->first_node(), positions);
-		}
-		else if (dataNode->first_attribute()->value() == geometryID + "-normals")
-		{
-			FillBufferFromNode(dataNode->first_node(), normals);
-		}
-		else if (dataNode->first_attribute()->value() == geometryID + "-map-0")
-		{
-			FillBufferFromNode(dataNode->first_node(), uvs);
-		}
-		else if (dataNode->name() == triangleNodeName)
-		{
-			CreateIndices(dataNode->first_node("p"), positions, normals, uvs, vertices, indices);
-		}
+		sourceNodes.emplace(currentNode->first_attribute()->value(), std::make_pair(DataType::None, std::vector<std::byte>()));
+		DataType type = CreateBufferFromSourceNode(currentNode, sourceNodes.at(currentNode->first_attribute()->value()).second);
+		sourceNodes.at(currentNode->first_attribute()->value()).first = type;
+
+		currentNode = currentNode->next_sibling();
+	}
+
+	while (currentNode && currentNode->name() == verticesNodeName)
+	{
+		std::string id = currentNode->first_node("input")->first_attribute("source")->value();
+		id.erase(id.begin());
+
+		positions = ConvertTo<float>(sourceNodes.at(id).second);
+
+		currentNode = currentNode->next_sibling();
+	}
+
+	while (currentNode && currentNode->name() == triangleNodeName)
+	{
+		auto [v, i] = ParseTriangleNode(currentNode, positions, sourceNodes);
+		vertices = v;
+		indices = i;
+
+		currentNode = currentNode->next_sibling();
 	}
 
 	return GeometryData{vertices, indices};
 }
 
-void ColladaReader::FillBufferFromNode(rapidxml::xml_node<char>* node, std::vector<float>& buffer)
+/*
+Rough Structure of Source node(See collada spec 1.4.1, page 149 for more details)
+
+Source
+|__ Asset (Optional)
+|__ Array (One of many types)
+|__ Technique_Common
+	|__ Accessor
+		|__ Param
+		|__ Param
+
+*/
+ColladaReader::DataType ColladaReader::CreateBufferFromSourceNode(rapidxml::xml_node<char>* node, std::vector<std::byte>& buffer)
 {
-	char* strCount = node->first_attribute("count")->value();
+	auto currentNode = node->first_node();
+	if (std::strcmp(currentNode->name(), "asset") == 0)
+	{
+		currentNode = currentNode->next_sibling();
+	}
+	
+	char* strCount = currentNode->first_attribute("count")->value();
 	int count = atoi(strCount);
+	
+	auto arrayName = std::string(currentNode->name());
+	arrayName.erase(arrayName.size() - 6);
 
-	buffer.resize(count, 0.0f);
+	DataType dataType = StringToType(arrayName);
+	buffer.resize(SizeOfType(dataType) * count);
+	std::stringstream dataStream(currentNode->value());
 
-	std::stringstream dataStream(node->value());
-	for (int i = 0; i < count; ++i)
-		dataStream >> buffer[i];	
+	switch (dataType)
+	{
+	case ColladaReader::DataType::None:
+		break;
+	case ColladaReader::DataType::Name:
+		//TODO: Implement this!!
+		break;
+	case ColladaReader::DataType::Bool:
+		DeserializeArrayToBuffer(dataStream, reinterpret_cast<bool*>(buffer.data()), count);
+		break;
+	case ColladaReader::DataType::Float:
+		DeserializeArrayToBuffer(dataStream, reinterpret_cast<float*>(buffer.data()), count);
+		break;
+	case ColladaReader::DataType::Int:
+		DeserializeArrayToBuffer(dataStream, reinterpret_cast<int*>(buffer.data()), count);
+		break;
+	default:
+		break;
+	}
+
+	while (std::strcmp(currentNode->name(), "technique_common") != 0 && currentNode)
+		currentNode = currentNode->next_sibling();
+
+	//TODO: Implement it so that we actually use the values in the accessor node to parse mesh data
+
+
+	return dataType;
 }
 
-void ColladaReader::CreateIndices(rapidxml::xml_node<char>* dataNode,
-	const std::vector<float>& positions, const std::vector<float>& normals, const std::vector<float>& uvs,
-	std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
+constexpr ColladaReader::DataType ColladaReader::StringToType(const std::string& name)
 {
-	char* strCount = dataNode->parent()->first_attribute("count")->value();
-	size_t triangleCount = atoi(strCount);
+	if (name == "float")
+		return DataType::Float;
+	else if (name == "int")
+		return DataType::Int;
+	else if (name == "bool")
+		return DataType::Bool;
+	else if (name == "Name")
+		return DataType::Name;
+	
+	return DataType::None;
+}
 
-	const size_t totalVertices = triangleCount * VERTICES_PER_TRIANGLE;
-	const size_t totalAttributes = totalVertices * ATTRIBUTES_PER_VERTEX;
-
-	std::vector<size_t> triangleData(totalAttributes, 100);
-
+constexpr size_t ColladaReader::SizeOfType(DataType t)
+{
+	switch (t)
 	{
-		std::stringstream data(dataNode->value());
-		for (size_t i = 0; i < triangleData.size(); ++i)
-			data >> triangleData[i];
+	case ColladaReader::DataType::None:
+		return 0;
+	case ColladaReader::DataType::Name:
+		return 0;
+	case ColladaReader::DataType::Bool:
+		return sizeof(bool);
+	case ColladaReader::DataType::Float:
+		return sizeof(float);
+	case ColladaReader::DataType::Int:
+		return sizeof(int);
+	default:
+		return 0;
 	}
+}
 
-	indices.reserve(triangleCount * VERTICES_PER_TRIANGLE);
-	std::unordered_map<std::string, int> foundIndexes;
-	int currentPos = 0;
-	for (size_t i = 0; i < totalAttributes; i += ATTRIBUTES_PER_VERTEX)
+/*
+Rough structure of triangle(See collada spec 1.4.1, page 160 for more details)
+
+Triangle
+|__ Input
+|__ Input
+|__ Input
+|__ p
+
+*/
+std::pair<std::vector<Vertex>, std::vector<uint32_t>> ColladaReader::ParseTriangleNode(rapidxml::xml_node<char>* node, std::vector<float>& position, std::unordered_map<std::string, std::pair<DataType, std::vector<std::byte>>>& buffers)
+{
+	std::vector<glm::vec3> vertexPositions;
+	std::vector<glm::vec3> vertexNormals;
+	std::vector<glm::vec2> vertexUvs;
+
+	auto currentNode = node->first_node();
+	int8_t vertexOffset = -1, normalOffset = -1, uvOffset = -1;
+	uint32_t triangleCount = std::atoi(node->first_attribute("count")->value());
+
+	while (currentNode && std::strcmp(currentNode->name(), "input") == 0)
 	{
-		size_t positionIndex = triangleData[i + 0] * 3;
-		size_t normalIndex	 = triangleData[i + 1] * 3;
-		size_t texIndex		 = triangleData[i + 2] * 2;
+		std::string semantic = currentNode->first_attribute("semantic")->value();
+		std::string source = currentNode->first_attribute("source")->value();
+		source.erase(source.begin());
+		int8_t offset = std::atoi(currentNode->first_attribute("offset")->value());
 
-		std::string vertexID = std::to_string(positionIndex) + '-' + std::to_string(normalIndex) +
-			'-' + std::to_string(texIndex);
-
-		if (foundIndexes.count(vertexID) == 0)
+		if (semantic == "VERTEX")
 		{
-			foundIndexes[vertexID] = currentPos;
+			vertexOffset = offset;
+			vertexPositions = std::vector<glm::vec3>(position.size() / 3);
 
-			Vertex toBeAdded;
-			
-			toBeAdded.Position.x = positions[positionIndex + 0ul];
-			toBeAdded.Position.y = positions[positionIndex + 1ul];
-			toBeAdded.Position.z = positions[positionIndex + 2ul];
-
-			toBeAdded.Normal.x = normals[normalIndex + 0ul];
-			toBeAdded.Normal.y = normals[normalIndex + 1ul];
-			toBeAdded.Normal.z = normals[normalIndex + 2ul];
-
-			toBeAdded.UV.x = uvs[texIndex + 0ul];
-			toBeAdded.UV.y = uvs[texIndex + 1ul];
-
-			vertices.push_back(toBeAdded);
-			++currentPos;
+			for (size_t i = 0; i < vertexPositions.size(); ++i)
+			{
+				vertexPositions[i] = { position[i * 3], position[i * 3 + 1], position[i * 3 + 2] };
+			}
+		}
+		else if (semantic == "NORMAL")
+		{
+			normalOffset = offset;
+			vertexNormals = ConvertTo<glm::vec3>(buffers.at(source).second);
+		}
+		else if (semantic == "TEXCOORD")
+		{
+			uvOffset = offset;
+			vertexUvs = ConvertTo<glm::vec2>(buffers.at(source).second);
 		}
 
-		indices.push_back(foundIndexes[vertexID]);
+		currentNode = currentNode->next_sibling();
 	}
+
+	std::vector<Vertex> vertices;
+	std::vector<uint32_t> indexData;
+	std::unordered_map<std::string, int> vertexIds;
+	if (std::strcmp(currentNode->name(), "p") == 0)
+	{
+		std::vector<std::byte> buffer{ triangleCount * VERTICES_PER_TRIANGLE * ATTRIBUTES_PER_VERTEX * sizeof(int)};
+		std::stringstream dataStream(currentNode->value());
+		DeserializeArrayToBuffer(dataStream, reinterpret_cast<int*>(buffer.data()), triangleCount * VERTICES_PER_TRIANGLE * ATTRIBUTES_PER_VERTEX);
+		std::vector<int> indices = ConvertTo<int>(buffer);
+
+		const size_t totalIndices = triangleCount * VERTICES_PER_TRIANGLE;
+
+		indexData = std::vector<uint32_t>(totalIndices);
+
+		uint32_t currentId = 0;
+		for (size_t i = 0; i < totalIndices; ++i)
+		{
+			std::string vertexId = std::to_string(indices[i * VERTICES_PER_TRIANGLE + vertexOffset]) + '-' +
+				std::to_string(indices[i * VERTICES_PER_TRIANGLE + normalOffset]) + '-' +
+				std::to_string(indices[i * VERTICES_PER_TRIANGLE + uvOffset]);
+
+			if (vertexIds.count(vertexId) == 0)
+			{
+				vertices.push_back({});
+				vertices.back().Position =	vertexPositions[indices[i * VERTICES_PER_TRIANGLE + vertexOffset]];
+				vertices.back().Normal =	vertexNormals[	indices[i * VERTICES_PER_TRIANGLE + normalOffset]];
+				vertices.back().UV =		vertexUvs[		indices[i * VERTICES_PER_TRIANGLE + uvOffset]];
+				vertexIds[vertexId] = currentId;
+				++currentId;
+			}
+
+			indexData[i] = vertexIds[vertexId];
+		}
+	}
+
+	return { vertices, indexData };
 }
