@@ -4,6 +4,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+struct StbiDeleter
+{
+	void operator()(unsigned char* data) { stbi_image_free(data); }
+};
+
 Texture::Texture(uint32_t width, uint32_t height, const void* data, TextureType type)
 	: m_Type(type)
 {
@@ -14,8 +19,9 @@ Texture::Texture(const std::string& path)
 	:m_Type(TextureType::Color)
 {
 	int width, height, channels;
-	unsigned char* data = nullptr;
-	data = stbi_load(path.c_str(), &width, &height, &channels, 4);
+
+	std::unique_ptr<unsigned char, StbiDeleter> data = nullptr;
+	data.reset(stbi_load(path.c_str(), &width, &height, &channels, 4));
 
 	if (data == NULL)
 	{
@@ -24,9 +30,7 @@ Texture::Texture(const std::string& path)
 		return;
 	}
 
-	Create(width, height, data);
-
-	stbi_image_free(data);
+	Create(width, height, data.get());
 }
 
 Texture::~Texture()
